@@ -1,0 +1,82 @@
+global:
+  domain: consul
+  datacenter: europe-west1
+  # see https://www.consul.io/docs/k8s/installation/deployment-configurations/consul-enterprise
+  image: 'hashicorp/consul-enterprise:1.9.1-ent'
+
+  # Gossip encryption
+  gossipEncryption:
+    secretName: hashicorp-consul-federation
+    secretKey: gossipEncryptionKey
+  tls:
+    enabled: true
+    caCert:
+      secretName: hashicorp-consul-federation
+      secretKey: caCert
+    caKey:
+      secretName: hashicorp-consul-federation
+      secretKey: caKey
+  enableConsulNamespaces: true
+  acls:
+    manageSystemACLs: true
+    replicationToken:
+      secretName: hashicorp-consul-federation
+      secretKey: replicationToken
+  federation:
+    enabled: true
+# Configure your Consul servers in this section.
+server:
+  replicas: 3
+  bootstrapExpect: 3
+  enterpriseLicense:
+    secretName: 'consul-ent-license'
+    secretKey: 'key'
+  extraVolumes:
+    - type: secret
+      name: hashicorp-consul-federation
+      items:
+        - key: serverConfigJSON
+          path: config.json
+      load: true
+SyncCatalog:
+  enabled: true
+
+# Configure Consul clients in this section
+client:
+  # Specify the resources that clients request for deployment.
+  resources:
+    requests:
+      memory: "100Mi"
+      cpu: "100m"
+    limits:
+      memory: "100Mi"
+      cpu: "100m"
+# Enable and configure the Consul UI.
+ui:
+  enabled: true
+  service:
+    type: LoadBalancer
+# Configure security for Consul Connect pod injection
+connectInject:
+  enabled: true
+  # default: true
+  centralConfig:
+    enabled: true
+controller:
+  enabled: true
+ingressGateways:
+  enabled: true
+  gateways:
+    - name: ingress-gateway
+      service:
+        type: LoadBalancer
+meshGateway:
+  enabled: true
+  globalMode: local
+  # wanAddress:
+  #   source: Static
+  #   static: ${azurerm_public_ip.meshgateway_ip.ip_address}
+  service:
+    type: LoadBalancer
+terminatingGateways:
+  enabled: true
