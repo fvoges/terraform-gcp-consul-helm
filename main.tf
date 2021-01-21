@@ -23,8 +23,8 @@ resource "kubernetes_secret" "consul_gossip_encryption_key" {
 locals {
   helm_template_values = {
     consul_image = var.consul_image
-    role  = var.role
-
+    role         = var.role
+    datacenter   = var.region
   }
 }
 

@@ -1,6 +1,6 @@
 global:
   domain: consul
-  datacenter: lon1
+  datacenter: ${datacenter}
   # see https://www.consul.io/docs/k8s/installation/deployment-configurations/consul-enterprise
   image: '${consul_image}'
 
