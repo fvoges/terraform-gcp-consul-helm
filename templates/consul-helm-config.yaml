@@ -10,7 +10,7 @@ global:
     secretName: 'consul-gossip-encryption-key'
     secretKey: 'key'
 %{ else ~}
-      secretName: hashicorp-consul-federation
+    secretName: hashicorp-consul-federation
     secretKey: gossipEncryptionKey
 %{ endif ~}
   tls:
