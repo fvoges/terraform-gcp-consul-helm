@@ -1,29 +1,47 @@
 global:
   domain: consul
-  datacenter: europe-west1
+  datacenter: lon1
   # see https://www.consul.io/docs/k8s/installation/deployment-configurations/consul-enterprise
-  image: 'hashicorp/consul-enterprise:1.9.1-ent'
+  image: '${consul_image}'
 
   # Gossip encryption
   gossipEncryption:
-    secretName: hashicorp-consul-federation
+%{ if role == "primary" ~}
+    secretName: 'consul-gossip-encryption-key'
+    secretKey: 'key'
+%{ else ~}
+      secretName: hashicorp-consul-federation
     secretKey: gossipEncryptionKey
+%{ endif ~}
   tls:
     enabled: true
+%{ if role == "primary" ~}
+    enableAutoEncrypt: true
+    serverAdditionalDNSSANs: []
+%{ else ~}
     caCert:
       secretName: hashicorp-consul-federation
       secretKey: caCert
     caKey:
       secretName: hashicorp-consul-federation
       secretKey: caKey
+%{ endif ~}
+
   enableConsulNamespaces: true
   acls:
     manageSystemACLs: true
+%{ if role == "primary" ~}
+    createReplicationToken: true
+%{ else ~}
     replicationToken:
       secretName: hashicorp-consul-federation
       secretKey: replicationToken
+%{ endif ~}
   federation:
     enabled: true
+%{ if role == "primary" ~}
+    createFederationSecret: true
+%{ endif ~}
 # Configure your Consul servers in this section.
 server:
   replicas: 3
@@ -31,6 +49,7 @@ server:
   enterpriseLicense:
     secretName: 'consul-ent-license'
     secretKey: 'key'
+%{ if role == "secondary" ~}
   extraVolumes:
     - type: secret
       name: hashicorp-consul-federation
@@ -38,6 +57,8 @@ server:
         - key: serverConfigJSON
           path: config.json
       load: true
+%{ endif ~}
+
 SyncCatalog:
   enabled: true
 
@@ -51,32 +72,35 @@ client:
     limits:
       memory: "100Mi"
       cpu: "100m"
+
 # Enable and configure the Consul UI.
 ui:
   enabled: true
   service:
     type: LoadBalancer
+
 # Configure security for Consul Connect pod injection
 connectInject:
   enabled: true
   # default: true
   centralConfig:
     enabled: true
+
 controller:
   enabled: true
+
 ingressGateways:
   enabled: true
   gateways:
     - name: ingress-gateway
       service:
         type: LoadBalancer
+
 meshGateway:
   enabled: true
   globalMode: local
-  # wanAddress:
-  #   source: Static
-  #   static: ${azurerm_public_ip.meshgateway_ip.ip_address}
   service:
     type: LoadBalancer
+
 terminatingGateways:
   enabled: true

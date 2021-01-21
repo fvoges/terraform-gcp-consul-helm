@@ -11,4 +11,3 @@ This requires a secondary K8s cluster with the Consul Federation secrets importe
 ## Consul License
 
 The code deploys Consul Enterprise, so it requires a Consul license.
-

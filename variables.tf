@@ -27,3 +27,9 @@ variable "project_id" {
   type = string
   description = "GCP project ID"
 }
+
+variable "consul_image" {
+  type = string
+  description = "Consul Enterprise Docker image to use"
+  default = "hashicorp/consul-enterprise:latest"
+}

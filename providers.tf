@@ -1,13 +1,3 @@
-terraform {
-  # backend "remote" {
-  #   organization = "hc-implementation-services"
-
-  #   workspaces {
-  #     name = "arvato-gcp-k8s-consul-primary"
-  #   }
-  # }
-}
-
 provider "google" {
   project     = var.project_id
   region      = var.region
